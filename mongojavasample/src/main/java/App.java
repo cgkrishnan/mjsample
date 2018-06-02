@@ -10,18 +10,11 @@ public class App {
         App obj = new App();
         File[] files = new File("/home/gautam/Desktop/output").listFiles();
         readFiles(files);
-
-        MongoConnect connect = new MongoConnect();
-
-        List<String> dbnames = connect.readData();
-        for(String db : dbnames)
-        {
-            System.out.println("DB Name:"+db);
-        }
     }
 
     public static void readFiles(File[] files) {
 
+        MongoConnect connect = new MongoConnect();
 
         for (File file : files) {
             if (file.isDirectory()) {
@@ -34,13 +27,16 @@ public class App {
                     BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file.getAbsolutePath()));
                     CompressorInputStream input = new CompressorStreamFactory().createCompressorInputStream(bis);
                     BufferedReader br2 = new BufferedReader(new InputStreamReader(input));
-                    StringBuilder sb = new StringBuilder();
+
+
                     String line;
                     while ((line = br2.readLine()) != null) {
+                        StringBuilder sb = new StringBuilder();
                         sb.append(line);
+                        JSONObject json = new JSONObject(sb.toString());
+                        connect.writeData(json);
+                        //System.out.println("Out:"+json.getString("auctionId")+" FileName:"+file.getName());
                     }
-                    JSONObject json = new JSONObject(sb.toString());
-                    System.out.println("Out:"+json.getString("auctionId"));
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
